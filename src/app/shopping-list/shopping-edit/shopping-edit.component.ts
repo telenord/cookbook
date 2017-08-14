@@ -1,13 +1,9 @@
-import {
-  Component,
-  OnInit,
-  ElementRef,
-  ViewChild,
-  EventEmitter,
-  Output
-} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 
-import { Ingredient } from '../../shared/ingredient.model';
+import {Ingredient} from '../../shared/ingredient.model';
+import {ShoppingListService} from '../shopping-list.service';
+import {NgForm} from '@angular/forms';
+import {Subscription} from 'rxjs/Subscription';
 
 @Component({
   selector: 'app-shopping-edit',
@@ -15,20 +11,50 @@ import { Ingredient } from '../../shared/ingredient.model';
   styleUrls: ['./shopping-edit.component.css']
 })
 export class ShoppingEditComponent implements OnInit {
-  @ViewChild('nameInput') nameInputRef: ElementRef;
-  @ViewChild('amountInput') amountInputRef: ElementRef;
-  @Output() ingredientAdded = new EventEmitter<Ingredient>();
+  @ViewChild('f') slForm: NgForm;
+  public editMode = false;
+  public editItemIndex: number;
+  public editItem: Ingredient;
+  public editItemSub: Subscription;
 
-  constructor() { }
-
-  ngOnInit() {
+  constructor(private slService: ShoppingListService) {
   }
 
-  onAddItem() {
-    const ingName = this.nameInputRef.nativeElement.value;
-    const ingAmount = this.amountInputRef.nativeElement.value;
-    const newIngredient = new Ingredient(ingName, ingAmount);
-    this.ingredientAdded.emit(newIngredient);
+  ngOnInit() {
+    this.editItemSub = this.slService.startEditingItem.subscribe(
+      (index: number) => {
+        this.editItemIndex = index;
+        this.editMode = true;
+        this.editItem = this.slService.getIngredient(index);
+        this.slForm.setValue({
+          name: this.editItem.name,
+          amount: this.editItem.amount
+        });
+      });
+  }
+
+  onAddItem(form: NgForm) {
+    const newIngredient = new Ingredient(form.value.name, form.value.amount);
+    if (this.editMode) {
+      this.slService.updateIngredient(this.editItemIndex, newIngredient);
+    } else {
+      this.slService.addIngredient(newIngredient);
+    }
+    this.editMode = false;
+    form.reset();
+  }
+
+  onDeleteItem() {
+
+
+
+    this.slService.deleteIngredient(this.editItemIndex);
+    this.onClearForm();
+  }
+
+  onClearForm() {
+    this.slForm.reset();
+    this.editMode = false;
   }
 
 }

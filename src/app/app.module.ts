@@ -14,9 +14,10 @@ import {ShoppingListComponent} from './shopping-list/shopping-list.component';
 import {ShoppingEditComponent} from './shopping-list/shopping-edit/shopping-edit.component';
 import {DropdownDirective} from './shared/dropdowndirective';
 import {PageNotFoundComponent} from './page-not-found/page-not-found.component';
-import { RecipeStartComponent } from './recipes/recipe-start/recipe-start.component';
+import {RecipeStartComponent} from './recipes/recipe-start/recipe-start.component';
 import {RecipeService} from './recipes/recipe.service';
-import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component';
+import {RecipeEditComponent} from './recipes/recipe-edit/recipe-edit.component';
+import {ShoppingListService} from './shopping-list/shopping-list.service';
 
 
 const appRoutes: Routes = [
@@ -55,7 +56,10 @@ const appRoutes: Routes = [
     HttpModule,
     RouterModule.forRoot(appRoutes)
   ],
-  providers: [RecipeService],
+  providers: [
+    RecipeService,
+    ShoppingListService
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {
